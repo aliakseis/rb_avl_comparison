@@ -20,6 +20,8 @@ typedef long ssize_t;
 #include <assert.h>
 //#define RB_COMPACT // (Optional, embed color bits in right-child pointers.)
 
+//#define ORIGINAL
+
 #include <iostream>
 #include <random>
 
@@ -55,7 +57,7 @@ rb_gen(static, tree_, tree_t, node_t, link, node_cmp);
 
 //////////////////////////////////////////////////////////////////////////////
 
-#if 0
+#ifdef ORIGINAL
 
 typedef int value_t;
 
@@ -338,7 +340,7 @@ int dir_check_depth(node tree)
     return 0;
 }
 
-#endif
+#else
 
 typedef int value_t;
 
@@ -375,24 +377,22 @@ private:
     node_s* m_node;
 };
 
-#if 0
-class node {
-public:
-    node() : m_node(NULL) {}
-    explicit node(node_s* n) : m_node(n) {}
-
-    node_s* operator ->() const { return m_node; }
-    explicit operator bool() const { return m_node != NULL; }
-    int longer() const;
-    void set_longer(int longer);
-
-    bool operator == (const node& other) const { return m_node == other.m_node; }
-    bool operator != (const node& other) const { return m_node != other.m_node; }
-
-private:
-    node_s* m_node;
-};
-#endif
+//class node {
+//public:
+//    node() : m_node(NULL) {}
+//    explicit node(node_s* n) : m_node(n) {}
+//
+//    node_s* operator ->() const { return m_node; }
+//    explicit operator bool() const { return m_node != NULL; }
+//    int longer() const;
+//    void set_longer(int longer);
+//
+//    bool operator == (const node& other) const { return m_node == other.m_node; }
+//    bool operator != (const node& other) const { return m_node != other.m_node; }
+//
+//private:
+//    node_s* m_node;
+//};
 
 
 struct node_s {
@@ -709,6 +709,7 @@ int dir_check_depth(node tree)
     return 0;
 }
 
+#endif //ORIGINAL
 
 //////////////////////////////////////////////////////////////////////////////
 
