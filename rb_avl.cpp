@@ -344,16 +344,70 @@ typedef int value_t;
 
 #define LEFT 0
 #define RIGHT 1
-#define NEITHER -1
+//#define NEITHER -1
+#define NEITHER 3
 
 typedef int direction;
 
-typedef struct node_s {
+//*node;
+
+struct node_s;
+
+class node {
+public:
+    node() : m_node(NULL) {}
+    explicit node(node_s* n) : m_node(n) {}
+
+    node_s* operator ->() const { return as_node(); }
+    explicit operator bool() const { return as_node() != NULL; }
+    int longer() const { return uintptr_t(m_node) & 3; }
+    void set_longer(int longer)
+    {
+        m_node = (node_s*)((intptr_t(m_node) & ssize_t(-4)) | longer);
+    }
+
+    bool operator == (const node& other) const { return as_node() == other.as_node(); }
+    bool operator != (const node& other) const { return as_node() != other.as_node(); }
+
+private:
+    node_s* as_node() const { return (node_s*)(intptr_t(m_node) & ssize_t(-4)); }
+
+    node_s* m_node;
+};
+
+#if 0
+class node {
+public:
+    node() : m_node(NULL) {}
+    explicit node(node_s* n) : m_node(n) {}
+
+    node_s* operator ->() const { return m_node; }
+    explicit operator bool() const { return m_node != NULL; }
+    int longer() const;
+    void set_longer(int longer);
+
+    bool operator == (const node& other) const { return m_node == other.m_node; }
+    bool operator != (const node& other) const { return m_node != other.m_node; }
+
+private:
+    node_s* m_node;
+};
+#endif
+
+
+struct node_s {
     value_t        value;
-    struct node_s *next[2];
-    int            longer : 2;
-} *node;
-#define Balanced(n) ((n)->longer < 0)
+    //struct node_s *next[2];
+    node next[2];
+    //int            longer : 2;
+};
+
+//inline int node::longer() const { return m_node->longer; }
+//inline void node::set_longer(int longer) { m_node->longer = longer; }
+
+
+//#define Balanced(n) ((n)->longer < 0)
+#define Balanced(n) ((n).longer() == NEITHER)
 
 
 node avl_find(node tree, value_t target)
@@ -375,11 +429,11 @@ static node* avl_rotate_2(node *path_top, direction dir, int longer_ = NEITHER)
     *path_top = D;
 
     //(*path_top)->next[1 - dir] = B;
-    (*path_top)->longer = NEITHER;
+    (*path_top).set_longer(NEITHER);
 
     node* B_ = &(*path_top)->next[1 - dir];
     *B_ = B;
-    (*B_)->longer = longer_;//NEITHER;
+    (*B_).set_longer(longer_);//NEITHER;
     (*B_)->next[dir] = C;
 
     //B->longer = NEITHER;
@@ -412,25 +466,25 @@ static node* avl_rotate_3(node *path_top, direction dir, direction third)
     *E_ = E;
 
     //D->longer = NEITHER;
-    (*path_top)->longer = NEITHER;
+    (*path_top).set_longer(NEITHER);
 
     /* assume both trees are balanced */
-    (*B_)->longer = NEITHER;
-    (*F_)->longer = NEITHER;
+    (*B_).set_longer(NEITHER);
+    (*F_).set_longer(NEITHER);
 
     if (third == NEITHER) {
         //return NULL;
-        static node null = NULL;
+        static node null(NULL);
         return &null;
     }
     else if (third == dir) {
         /* E holds the insertion so B is unbalanced */
-        (*B_)->longer = 1 - dir;
+        (*B_).set_longer(1 - dir);
         return E_;
     }
     else {
         /* C holds the insertion so F is unbalanced */
-        (*F_)->longer = dir;
+        (*F_).set_longer(dir);
         return C_;
     }
 }
@@ -449,7 +503,7 @@ static inline void avl_rebalance_path(node* path, value_t target)
     */
     while ((*path) && target != (*path)->value) {
         direction next_step = (target > (*path)->value);
-        (*path)->longer = next_step;
+        (*path).set_longer(next_step);
         path = &(*path)->next[next_step];
     }
 }
@@ -460,9 +514,9 @@ static inline void avl_rebalance_insert(node *path_top, value_t target)
     direction first, second, third;
     if (Balanced(*path))
         ;
-    else if ((*path)->longer != (first = (target > (*path)->value))) {
+    else if ((*path).longer() != (first = (target > (*path)->value))) {
         /* took the shorter path */
-        (*path)->longer = NEITHER;
+        (*path).set_longer(NEITHER);
         path = &(*path)->next[first];
     }
     else if (first == (second = (target > (*path)->next[first]->value))) {
@@ -507,8 +561,8 @@ int avl_insert(node *treep, node target)
         return 0;
     //tree = (node)malloc(sizeof(*tree));
     (*treep) = target;
-    (*treep)->next[0] = (*treep)->next[1] = NULL;
-    (*treep)->longer = NEITHER;
+    (*treep)->next[0] = (*treep)->next[1] = node(NULL);
+    (*treep).set_longer(NEITHER);
     //tree->value = target;
 
     //*treep = tree;
@@ -531,7 +585,7 @@ static inline node avl_swap_del(node *targetp, node *treep, direction dir)
     if (targetn != tree) {
         (*targetp)->next[LEFT] = targetn->next[LEFT];
         (*targetp)->next[RIGHT] = targetn->next[RIGHT];
-        (*targetp)->longer = targetn->longer;
+        (*targetp).set_longer(targetn.longer());
     }
 
     //free(targetn);
@@ -551,24 +605,25 @@ static inline node *avl_rebalance_del(node *treep, value_t target, node *targetp
         const node tree = *treep;
         direction dir = (target > tree->value);
 
-        if (tree->next[dir] == NULL)
+        //if (tree->next[dir] == NULL)
+        if (!tree->next[dir])
             break;
 
         if (Balanced(tree))
             //tree->longer = 1 - dir;
-            (*treep)->longer = 1 - dir;
-        else if (tree->longer == dir)
+            (*treep).set_longer(1 - dir);
+        else if (tree.longer() == dir)
             //tree->longer = NEITHER;
-            (*treep)->longer = NEITHER;
+            (*treep).set_longer(NEITHER);
         else {
-            int second = tree->next[1 - dir]->longer;
+            int second = tree->next[1 - dir].longer();
             if (second == dir)
                 avl_rotate_3(treep, 1 - dir,
-                    tree->next[1 - dir]->next[dir]->longer);
+                    tree->next[1 - dir]->next[dir].longer());
             else if (second == NEITHER) {
                 avl_rotate_2(treep, 1 - dir, 1 - dir);
                 //tree->longer = 1 - dir;
-                (*treep)->longer = dir;
+                (*treep).set_longer(dir);
             }
             else
                 avl_rotate_2(treep, 1 - dir);
@@ -596,16 +651,17 @@ node avl_delete(node *treep, value_t target)
         dir = (target > (*treep)->value);
         if (target == (*treep)->value)
             targetp = treep;
-        if ((*treep)->next[dir] == NULL)
+        //if ((*treep)->next[dir] == NULL)
+        if (!(*treep)->next[dir])
             break;
         if (Balanced((*treep))
-            || ((*treep)->longer == (1 - dir) && Balanced((*treep)->next[1 - dir]))
+            || ((*treep).longer() == (1 - dir) && Balanced((*treep)->next[1 - dir]))
             ) path_top = treep;
         treep = &(*treep)->next[dir];
         //tree = *treep;
     }
     if (!targetp)
-        return 0;
+        return node(NULL);
 
     /* adjust balance, but don't lose 'targetp' */
     targetp = avl_rebalance_del(path_top, target, targetp);
@@ -632,12 +688,12 @@ int dir_check_depth(node tree)
             rv = b + 1;
         }
         else if (b == f - 1) {
-            if (tree->longer != RIGHT)
+            if (tree.longer() != RIGHT)
                 err = 1;
             rv = f + 1;
         }
         else if (b - 1 == f) {
-            if (tree->longer != LEFT)
+            if (tree.longer() != LEFT)
                 err = 1;
             rv = b + 1;
         }
@@ -647,7 +703,7 @@ int dir_check_depth(node tree)
         }
         if (err)
             printf("err at %d: b=%d f=%d longer=%d\n", tree->value,
-            b, f, tree->longer);
+            b, f, tree.longer());
         return rv;
     }
     return 0;
@@ -682,8 +738,6 @@ double getDepth(T tree, T null = static_cast<T>(0))
 
 
 enum { NNODES = 10000000 };
-//enum { NNODES = 1000000 };
-//enum { NNODES = 1000 };
 
 
 int main(int argc, char* argv[])
@@ -760,7 +814,7 @@ int main(int argc, char* argv[])
 
     // AVL
     {
-        node nodes = new node_s[NNODES];
+        node_s* nodes = new node_s[NNODES];
 
         std::default_random_engine dre(0);
         for (int i = 0; i < NNODES; ++i)
@@ -772,13 +826,13 @@ int main(int argc, char* argv[])
             nodes[j].value = i;
         }
 
-        node tree = NULL;
+        node tree(NULL);
 
         clock_t start = clock();
 
         for (int i = 0; i < NNODES; ++i)
         {
-            avl_insert(&tree, nodes + i);
+            avl_insert(&tree, node(nodes + i));
         }
 
         cout << "  avl_insert time: " <<
@@ -825,7 +879,8 @@ int main(int argc, char* argv[])
             (double)(clock() - start) / CLOCKS_PER_SEC <<
             " seconds" << endl;
 
-        if (tree != NULL)
+        //if (tree != NULL)
+        if (tree)
             cout << "AVL tree is not empty!" << endl;
 
         delete[] nodes;
