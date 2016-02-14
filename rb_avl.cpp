@@ -344,14 +344,14 @@ int dir_check_depth(node tree)
 
 typedef int value_t;
 
-#define LEFT 0
-#define RIGHT 1
-//#define NEITHER -1
-#define NEITHER 3
+enum {
+    LEFT = 0,
+    RIGHT = 1,
+    NEITHER = 3,
+};
 
 typedef int direction;
 
-//*node;
 
 struct node_s;
 
@@ -378,37 +378,15 @@ private:
     node_s* m_node;
 };
 
-//class node {
-//public:
-//    node() : m_node(NULL) {}
-//    explicit node(node_s* n) : m_node(n) {}
-//
-//    node_s* operator ->() const { return m_node; }
-//    explicit operator bool() const { return m_node != NULL; }
-//    int longer() const;
-//    void set_longer(int longer);
-//
-//    bool operator == (const node& other) const { return m_node == other.m_node; }
-//    bool operator != (const node& other) const { return m_node != other.m_node; }
-//
-//private:
-//    node_s* m_node;
-//};
-
 
 struct node_s {
     value_t        value;
-    //struct node_s *next[2];
     node next[2];
-    //int            longer : 2;
 };
 
-//inline int node::longer() const { return m_node->longer; }
-//inline void node::set_longer(int longer) { m_node->longer = longer; }
 
-
-//#define Balanced(n) ((n)->longer < 0)
-#define Balanced(n) ((n).longer() == NEITHER)
+//#define Balanced(n) ((n).longer() == NEITHER)
+inline bool Balanced(const node& n) { return n.longer() == NEITHER; }
 
 
 node avl_find(node tree, value_t target)
@@ -748,7 +726,7 @@ int main(int argc, char* argv[])
     {
         node_t* nodes = new node_t[NNODES];
 
-        std::default_random_engine dre(0);
+        std::default_random_engine dre;
         for (int i = 0; i < NNODES; ++i)
         {
             std::uniform_int_distribution<int> di(0, i);
@@ -818,7 +796,7 @@ int main(int argc, char* argv[])
     {
         node_s* nodes = new node_s[NNODES];
 
-        std::default_random_engine dre(0);
+        std::default_random_engine dre;
         for (int i = 0; i < NNODES; ++i)
         {
             std::uniform_int_distribution<int> di(0, i);
