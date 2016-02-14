@@ -18,7 +18,7 @@ typedef long ssize_t;
 #include <stdbool.h>
 //#define NDEBUG // (Optional, see assert(3).)
 #include <assert.h>
-//#define RB_COMPACT // (Optional, embed color bits in right-child pointers.)
+#define RB_COMPACT // (Optional, embed color bits in right-child pointers.)
 
 //#define ORIGINAL
 
@@ -361,10 +361,11 @@ public:
     explicit node(node_s* n) : m_node(n) {}
 
     node_s* operator ->() const { return as_node(); }
-    explicit operator bool() const { return as_node() != NULL; }
+    explicit operator bool() const { return m_node != NULL; }
     int longer() const { return uintptr_t(m_node) & 3; }
     void set_longer(int longer)
     {
+        assert(m_node != NULL);
         m_node = (node_s*)((intptr_t(m_node) & ssize_t(-4)) | longer);
     }
 
