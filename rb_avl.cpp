@@ -368,6 +368,7 @@ public:
         assert(m_node != NULL);
         m_node = (node_s*)((intptr_t(m_node) & ssize_t(-4)) | longer);
     }
+    bool balanced() const { return (uintptr_t(m_node) & 2) != 0; }
 
     bool operator == (const node& other) const { return as_node() == other.as_node(); }
     bool operator != (const node& other) const { return as_node() != other.as_node(); }
@@ -383,9 +384,6 @@ struct node_s {
     value_t        value;
     node next[2];
 };
-
-
-inline bool Balanced(const node& n) { return n.longer() == NEITHER; }
 
 
 node avl_find(node tree, value_t target)
@@ -482,7 +480,7 @@ static inline void avl_rebalance_insert(node *path_top, value_t target)
 {
     node* path = path_top;
     direction first, second, third;
-    if (Balanced(*path))
+    if (path->balanced())
         ;
     else if (path->longer() != (first = (target > (*path)->value))) {
         /* took the shorter path */
@@ -522,14 +520,15 @@ int avl_insert(node *treep, node target)
             cout << "Duplicates are not allowed in the tree" << endl;
             exit(1);
         }
-        if (!Balanced(*treep)) path_top = treep;
+        if (!treep->balanced()) path_top = treep;
         treep = &(*treep)->next[target->value > (*treep)->value];
     }
     if (*treep)
         return 0;
     //tree = (node)malloc(sizeof(*tree));
     (*treep) = target;
-    (*treep)->next[0] = (*treep)->next[1] = node(NULL);
+    (*treep)->next[0] = node(NULL);
+    (*treep)->next[1] = node(NULL);
     treep->set_longer(NEITHER);
     //tree->value = target;
 
@@ -574,21 +573,22 @@ static inline node *avl_rebalance_del(node *treep, value_t target, node *targetp
         if (!tree->next[dir])
             break;
 
-        if (Balanced(tree))
+        const int longer = tree.longer();
+        if (longer == NEITHER)
             treep->set_longer(1 - dir);
-        else if (tree.longer() == dir)
+        else if (longer == dir)
             treep->set_longer(NEITHER);
         else {
-            int second = tree->next[1 - dir].longer();
+            const int second = tree->next[longer].longer();
             if (second == dir)
-                avl_rotate_3(treep, 1 - dir,
-                    tree->next[1 - dir]->next[dir].longer());
+                avl_rotate_3(treep, longer,
+                    tree->next[longer]->next[dir].longer());
             else if (second == NEITHER) {
-                avl_rotate_2(treep, 1 - dir, 1 - dir);
+                avl_rotate_2(treep, longer, longer);
                 treep->set_longer(dir);
             }
             else
-                avl_rotate_2(treep, 1 - dir);
+                avl_rotate_2(treep, longer);
             if (tree == targetn)
                 targetp = &(*treep)->next[dir];
         }
@@ -614,8 +614,9 @@ node avl_delete(node *treep, value_t target)
             targetp = treep;
         if (!(*treep)->next[dir])
             break;
-        if (Balanced((*treep))
-            || (treep->longer() == (1 - dir) && Balanced((*treep)->next[1 - dir]))
+        const int longer = treep->longer();
+        if (longer == NEITHER
+            || (longer != dir && (*treep)->next[longer].balanced())
             ) path_top = treep;
         treep = &(*treep)->next[dir];
     }
@@ -642,7 +643,7 @@ int dir_check_depth(node tree)
         int b = dir_check_depth(tree->next[LEFT]);
         int f = dir_check_depth(tree->next[RIGHT]);
         if (b == f) {
-            if (!Balanced(tree))
+            if (!tree.balanced())
                 err = 1;
             rv = b + 1;
         }
