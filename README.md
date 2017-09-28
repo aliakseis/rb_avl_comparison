@@ -1,13 +1,13 @@
 # rb_avl_comparison
-Comparing RB and AVL implementations
+### Comparing RB and AVL implementations
 
-RB tree:
+#### RB tree:
 
 "We developed a new red-black tree implementation that has the same low memory overhead (two pointer fields per node), but is approximately 30% faster for insertion/removal."
 
 https://www.facebook.com/notes/facebook-engineering/scalable-memory-allocation-using-jemalloc/480222803919/
 
-AVL tree:
+#### AVL tree:
 
 http://neil.brown.name/blog/AVL - after a small modification to reduce memory hits
 
