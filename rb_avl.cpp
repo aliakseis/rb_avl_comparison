@@ -42,7 +42,7 @@ struct node_ {
 
 
 static int
-node_cmp(node_t *a, node_t *b) {
+node_cmp(const node_t *a, const node_t *b) {
     int ret = (a->key > b->key) - (a->key < b->key);
     if (ret == 0 && a != b) {
         cout << "Duplicates are not allowed in the tree" << endl;
@@ -731,7 +731,7 @@ int main(int argc, char* argv[])
             (double)(clock() - start) / CLOCKS_PER_SEC <<
             " seconds" << endl;
 
-        cout << "    RB depth: " << getDepth(tree.rbt_root, &tree.rbt_nil) << endl;
+        cout << "    RB depth: " << getDepth(tree.rbt_root) << endl;
 
         start = clock();
 
