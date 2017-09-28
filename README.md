@@ -13,6 +13,8 @@ http://neil.brown.name/blog/AVL - after a small modification to reduce memory hi
 
 ### 10000000 nodes test
 
+CPU  E2180  @ 2.00GHz
+
 Target: x86_64-redhat-linux
 gcc version 5.3.1 20160406 (Red Hat 5.3.1-6) (GCC)
 
