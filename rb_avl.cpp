@@ -10,7 +10,7 @@
 
 #if defined(_WIN64)
 typedef __int64 ssize_t;
-#else if defined(_WIN32)
+#elif defined(_WIN32)
 typedef long ssize_t;
 #endif
 
