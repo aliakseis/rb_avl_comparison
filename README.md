@@ -31,3 +31,22 @@ sudo nice -n -20 ./main
   avl_find time: 17.5718 seconds  
   alternative avl_find time: 19.446 seconds  
   avl_delete time: 22.9048 seconds  
+
+CPU i5-6600 @ 3.30GHz
+
+Target: x86_64-linux-gnu
+gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.6)
+
+sudo nice -n -20 ./main
+
+  tree_insert time: 10.375 seconds
+    RB depth: 22.1559
+  tree_search time: 9.85938 seconds
+  alternative tree_search time: 10.9844 seconds
+  tree_remove time: 12.0156 seconds
+
+  avl_insert time: 9.89062 seconds
+    AVL depth: 21.7497
+  avl_find time: 7.84375 seconds
+  alternative avl_find time: 7.67188 seconds
+  avl_delete time: 11.5781 seconds
