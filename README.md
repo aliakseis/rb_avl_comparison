@@ -50,3 +50,21 @@ sudo nice -n -20 ./main
   avl_find time: 7.84375 seconds  
   alternative avl_find time: 7.67188 seconds  
   avl_delete time: 11.5781 seconds  
+
+
+clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)
+
+clang++ -Wall -O3 -std=c++11 rb_avl.cpp -o rb_avl  
+sudo nice -n -20 ./rb_avl
+
+  tree_insert time: 10.7969 seconds  
+    RB depth: 22.1559  
+  tree_search time: 10.125 seconds  
+  alternative tree_search time: 11.0312 seconds  
+  tree_remove time: 12.2969 seconds  
+
+  avl_insert time: 10.6875 seconds  
+    AVL depth: 21.7497  
+  avl_find time: 5.64062 seconds  
+  alternative avl_find time: 6.1875 seconds  
+  avl_delete time: 12.0938 seconds  
