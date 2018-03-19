@@ -51,6 +51,21 @@ sudo nice -n -20 ./main
   alternative avl_find time: 7.67188 seconds  
   avl_delete time: 11.5781 seconds  
 
+enum { NNODES = 20 * 10000000 };
+
+sudo nice -n -20 ./main
+
+  tree_insert time: 388.344 seconds  
+    RB depth: 26.6402  
+  tree_search time: 324.953 seconds  
+  alternative tree_search time: 330.125 seconds  
+  tree_remove time: 397.578 seconds  
+
+  avl_insert time: 298.062 seconds  
+    AVL depth: 26.0732  
+  avl_find time: 264.625 seconds  
+  alternative avl_find time: 267 seconds  
+  avl_delete time: 399.719 seconds  
 
 clang version 3.8.0-2ubuntu4 (tags/RELEASE_380/final)
 
