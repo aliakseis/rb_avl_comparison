@@ -1,6 +1,8 @@
 # rb_avl_comparison
 ### Comparing RB and AVL implementations
 
+"I think I have discovered something that no one else has any idea about, and I’m not sure I can do it justice. Its scope is so broad that I can see only parts of it clearly at one time, and it is exceedingly difficult to set down comprehensibly in writing…" Jordan Peterson 
+
 #### RB tree:
 
 "We developed a new red-black tree implementation that has the same low memory overhead (two pointer fields per node), but is approximately 30% faster for insertion/removal."
