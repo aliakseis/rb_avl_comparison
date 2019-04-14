@@ -1,6 +1,10 @@
 # rb_avl_comparison
 ### Comparing RB and AVL implementations
 
+![trump_family](https://user-images.githubusercontent.com/11851670/56092402-5db11c80-5ec4-11e9-84f1-94e1d643a09f.jpg)
+
+Make AVL Trees Great Again announcement
+
 "I think I have discovered something that no one else has any idea about, and I’m not sure I can do it justice. Its scope is so broad that I can see only parts of it clearly at one time, and it is exceedingly difficult to set down comprehensibly in writing…" Jordan Peterson 
 
 #### RB tree:
