@@ -17,6 +17,12 @@ https://www.facebook.com/notes/facebook-engineering/scalable-memory-allocation-u
 
 http://neil.brown.name/blog/AVL - after a small modification to reduce memory hits
 
+## [Just one more thing:](https://www.youtube.com/watch?v=QxBnaMGP2aY)
+
+Please note [this function.](https://github.com/aliakseis/rb_avl_comparison/blob/c195ef96ae14f630e1add8688b269785dfd54ebf/rb_avl.cpp#L365)
+
+This is how an item deletion from the tree is accelerated by lowering memory access.
+
 ### 10000000 nodes test
 
 CPU  E2180  @ 2.00GHz
