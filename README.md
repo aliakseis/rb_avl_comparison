@@ -13,6 +13,8 @@ Make AVL Trees Great Again announcement
 
 https://www.facebook.com/notes/facebook-engineering/scalable-memory-allocation-using-jemalloc/480222803919/
 
+https://github.com/jemalloc/jemalloc/blob/dev/include/jemalloc/internal/rb.h
+
 #### AVL tree:
 
 http://neil.brown.name/blog/AVL - after a small modification to reduce memory hits
