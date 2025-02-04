@@ -57,13 +57,13 @@ rb_gen(static, tree_, tree_t, node_t, link, node_cmp);
 
 //////////////////////////////////////////////////////////////////////////////
 
-#ifdef ORIGINAL
+namespace original {
 
 typedef int value_t;
 
-#define LEFT 0
-#define RIGHT 1
-#define NEITHER -1
+const int LEFT = 0;
+const int RIGHT = 1;
+const int NEITHER = -1;
 
 typedef int direction;
 
@@ -340,7 +340,9 @@ int dir_check_depth(node tree)
     return 0;
 }
 
-#else
+}
+
+namespace patched {
 
 typedef int value_t;
 
@@ -669,7 +671,7 @@ int dir_check_depth(node tree)
     return 0;
 }
 
-#endif //ORIGINAL
+}
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -682,7 +684,8 @@ std::pair<unsigned int, unsigned long long> doGetGepth(node_t* tree, node_t* nul
     return{ 1u + left.first + right.first, left.second + right.second + level };
 }
 
-std::pair<unsigned int, unsigned long long> doGetGepth(node tree, node null, unsigned int level)
+template <typename T>
+std::pair<unsigned int, unsigned long long> doGetGepth(T tree, T null, unsigned int level)
 {
     if (tree == null)
         return std::make_pair(0u, 0ull);
@@ -775,6 +778,85 @@ int main(int argc, char* argv[])
 
     // AVL
     {
+        using namespace original;
+
+        node_s* nodes = new node_s[NNODES];
+
+        std::default_random_engine dre;
+        for (int i = 0; i < NNODES; ++i)
+        {
+            std::uniform_int_distribution<int> di(0, i);
+            const int j = di(dre);
+            if (i != j)
+                nodes[i].value = nodes[j].value;
+            nodes[j].value = i;
+        }
+
+        node tree(NULL);
+
+        clock_t start = clock();
+
+        for (int i = 0; i < NNODES; ++i)
+        {
+            avl_insert(&tree, node(nodes + i));
+        }
+
+        cout << "  avl_insert time: " <<
+            (double)(clock() - start) / CLOCKS_PER_SEC <<
+            " seconds" << endl;
+
+        cout << "    AVL depth: " << getDepth(tree) << endl;
+
+        start = clock();
+
+        for (int i = 0; i < NNODES; ++i)
+        {
+            if (!avl_find(tree, nodes[i].value))
+                cout << "Strange failure to avl_find " << nodes[i].value << '\n';
+        }
+
+        cout << "  avl_find time: " <<
+            (double)(clock() - start) / CLOCKS_PER_SEC <<
+            " seconds" << endl;
+
+        start = clock();
+
+        for (int i = 0; i < NNODES; ++i)
+        {
+            if (!avl_find(tree, nodes[nodes[i].value].value))
+                cout << "Strange failure to avl_find " << nodes[i].value << '\n';
+        }
+
+        cout << "  alternative avl_find time: " <<
+            (double)(clock() - start) / CLOCKS_PER_SEC <<
+            " seconds" << endl;
+
+        dir_check_depth(tree);
+
+        start = clock();
+
+        for (int i = 0; i < NNODES; ++i)
+        {
+            if (!avl_delete(&tree, nodes[i].value))
+                cout << "Strange failure to avl_delete " << nodes[i].value << '\n';
+        }
+
+        cout << "  avl_delete time: " <<
+            (double)(clock() - start) / CLOCKS_PER_SEC <<
+            " seconds" << endl;
+
+        //if (tree != NULL)
+        if (tree)
+            cout << "AVL tree is not empty!" << endl;
+
+        delete[] nodes;
+    }
+
+    cout << endl;
+
+    {
+        using namespace patched;
+
         node_s* nodes = new node_s[NNODES];
 
         std::default_random_engine dre;
